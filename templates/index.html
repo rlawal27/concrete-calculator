@@ -2,134 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Concrete Calculator - Adillux</title>
+    <title>Concrete Calculator</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #eaf0f6;
+            color: #333;
             text-align: center;
         }
-
-        header {
-            background-color: #0050A0;
-            padding: 20px;
-            color: white;
+        h1 {
+            color: #004080;
         }
-
-        header img {
-            width: 120px;
-            display: block;
-            margin: 0 auto;
-        }
-
-        header h1 {
-            margin-top: 10px;
-            font-size: 24px;
-            color: white;
-        }
-
-        main {
-            padding: 20px;
-            max-width: 600px;
-            margin: auto;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        form {
+            background-color: #fff;
+            display: inline-block;
+            padding: 30px;
             margin-top: 30px;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
         }
-
         label {
-            font-weight: bold;
             display: block;
-            margin-top: 10px;
-            color: #333;
-            text-align: left;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #004080;
         }
-
-        input[type="number"] {
-            width: 100%;
+        input, select {
             padding: 8px;
+            width: 100%;
+            max-width: 300px;
             margin-top: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-
         button {
             margin-top: 20px;
-            background-color: #F4C542;
-            color: #000;
-            padding: 12px 25px;
+            padding: 10px 20px;
+            background-color: #004080;
+            color: white;
             border: none;
             border-radius: 5px;
-            font-weight: bold;
             cursor: pointer;
         }
-
         button:hover {
-            background-color: #e0b730;
+            background-color: #002c5a;
         }
-
-        .result {
+        .result, .download {
+            margin-top: 30px;
+        }
+        .logo {
+            width: 150px;
             margin-top: 20px;
-            text-align: left;
-            color: #333;
         }
-
-        footer {
-            margin-top: 40px;
-            padding: 15px;
-            background-color: #0050A0;
-            color: white;
-            font-size: 14px;
+        .estimate {
+            margin-top: 20px;
+            color: #2e7d32;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Adillux Logo">
-    <h1>Concrete Volume & Cost Calculator</h1>
-</header>
+    <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Logo" class="logo">
+    <h1>Concrete Calculator</h1>
 
-<main>
     <form method="POST">
+        <label for="work_type">Select Civil Work Type:</label>
+        <select name="work_type" required>
+            <option value="slab">Concrete Slab</option>
+            <option value="column">Column / Pillar</option>
+            <option value="beam">Beam</option>
+            <option value="footing">Foundation Footing</option>
+        </select>
+
         <label for="length">Length (meters):</label>
-        <input type="number" step="any" name="length" required>
+        <input type="number" name="length" step="any" required>
 
         <label for="width">Width (meters):</label>
-        <input type="number" step="any" name="width" required>
+        <input type="number" name="width" step="any" required>
 
         <label for="depth">Depth (meters):</label>
-        <input type="number" step="any" name="depth" required>
+        <input type="number" name="depth" step="any" required>
 
         <button type="submit">Calculate</button>
     </form>
 
     {% if result %}
     <div class="result">
-        <h2>Volume: {{ result }} m³</h2>
-        <h3>Material Estimates:</h3>
-        <ul>
-            {% for item in materials %}
-                <li>{{ item }}</li>
-            {% endfor %}
-        </ul>
-
-        <form method="POST" action="/download">
-            <input type="hidden" name="length" value="{{ length }}">
-            <input type="hidden" name="width" value="{{ width }}">
-            <input type="hidden" name="depth" value="{{ depth }}">
-            <button type="submit">Download Estimate as PDF</button>
-        </form>
+        <div class="estimate">
+            <p><strong>Volume:</strong> {{ result.volume }} m³</p>
+            <p><strong>Cement Bags:</strong> {{ result.cement }} bags</p>
+            <p><strong>Sand:</strong> ₦{{ result.sand_price }}</p>
+            <p><strong>Granite:</strong> ₦{{ result.granite_price }}</p>
+            <p><strong>Water:</strong> ₦{{ result.water_price }}</p>
+        </div>
+        <div class="download">
+            <form method="POST" action="/download">
+                <input type="hidden" name="work_type" value="{{ result.work_type }}">
+                <input type="hidden" name="volume" value="{{ result.volume }}">
+                <input type="hidden" name="cement" value="{{ result.cement }}">
+                <input type="hidden" name="sand_price" value="{{ result.sand_price }}">
+                <input type="hidden" name="granite_price" value="{{ result.granite_price }}">
+                <input type="hidden" name="water_price" value="{{ result.water_price }}">
+                <button type="submit">Download Estimate (PDF)</button>
+            </form>
+        </div>
     </div>
     {% endif %}
-</main>
-
-<footer>
-    © 2025 Adillux Technologies Ltd. All rights reserved.
-</footer>
 
 </body>
 </html>
