@@ -33,7 +33,6 @@
 <body>
 <div class="container text-center">
     <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Logo" class="logo">
-
     <h2>Concrete Volume Calculator</h2>
 
     <form method="POST">
@@ -52,11 +51,11 @@
     </form>
 
     {% if result %}
-        <form method="post" action="/download">
+        <form method="post" action="/download" class="mt-3">
             <input type="hidden" name="length" id="pdfLength">
             <input type="hidden" name="width" id="pdfWidth">
             <input type="hidden" name="depth" id="pdfDepth">
-            <button type="submit" class="btn btn-outline-success mt-3">Download Estimate as PDF</button>
+            <button type="submit" class="btn btn-outline-success">Download Estimate as PDF</button>
         </form>
 
         <div class="result-box text-start">
@@ -73,13 +72,18 @@
     {% endif %}
 </div>
 
+<!-- 🔧 JavaScript for syncing form values to the PDF form -->
 <script>
-    const syncInputs = () => {
-        document.getElementById('pdfLength').value = document.getElementById('length').value;
-        document.getElementById('pdfWidth').value = document.getElementById('width').value;
-        document.getElementById('pdfDepth').value = document.getElementById('depth').value;
-    };
-    document.querySelector('form[action="/download"]').addEventListener('submit', syncInputs);
+    window.addEventListener('DOMContentLoaded', () => {
+        const pdfForm = document.querySelector('form[action="/download"]');
+        if (pdfForm) {
+            pdfForm.addEventListener('submit', () => {
+                document.getElementById('pdfLength').value = document.getElementById('length').value;
+                document.getElementById('pdfWidth').value = document.getElementById('width').value;
+                document.getElementById('pdfDepth').value = document.getElementById('depth').value;
+            });
+        }
+    });
 </script>
 </body>
 </html>
