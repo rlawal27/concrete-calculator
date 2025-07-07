@@ -1,122 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Concrete Volume Calculator</title>
+    <meta charset="UTF-8">
+    <title>Concrete Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
             padding: 20px;
+            background-color: #f9f9f9;
+            font-family: 'Segoe UI', sans-serif;
         }
-
-        h1, h2, h3 {
-            color: #333;
+        .logo {
+            width: 120px;
+            margin-bottom: 10px;
         }
-
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+        .container {
+            max-width: 800px;
             margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-        }
-
-        input[type="submit"] {
-            margin-top: 20px;
-            padding: 10px;
-            width: 100%;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        .result {
-            background-color: #fff;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 8px;
-            max-width: 500px;
-            margin: 20px auto;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        ul li {
-            padding: 5px 0;
-        }
-
-        .total {
+        .section-title {
             font-weight: bold;
-            font-size: 20px;
-            color: green;
+            margin-top: 30px;
         }
     </style>
 </head>
-
 <body>
-    <div style="text-align: center; margin-bottom: 10px;">
-        <img src="{{ url_for('static', filename='images/adillux-logo.png') }}" alt="Adillux Logo" width="150">
-
+<div class="container">
+    <div class="text-center">
+        <img src="{{ url_for('static', filename='images/adillux-logo.png') }}" class="logo" alt="Logo">
+        <h2>🧱 Concrete Volume Calculator</h2>
+        <p class="text-muted">Estimate materials and cost for your concrete project</p>
     </div>
 
-    <h1>🧱 Concrete Volume Calculator</h1>
-
-    <form method="POST">
-        <label for="length">Length (m):</label>
-        <input type="number" name="length" step="0.01" required>
-
-        <label for="width">Width (m):</label>
-        <input type="number" name="width" step="0.01" required>
-
-        <label for="height">Height (m):</label>
-        <input type="number" name="height" step="0.01" required>
-
-        <input type="submit" value="Calculate">
+    <form method="post" class="row g-3 mt-4">
+        <div class="col-md-4">
+            <label for="length" class="form-label">Length (m)</label>
+            <input type="number" step="any" class="form-control" id="length" name="length" required>
+        </div>
+        <div class="col-md-4">
+            <label for="width" class="form-label">Width (m)</label>
+            <input type="number" step="any" class="form-control" id="width" name="width" required>
+        </div>
+        <div class="col-md-4">
+            <label for="depth" class="form-label">Depth (m)</label>
+            <input type="number" step="any" class="form-control" id="depth" name="depth" required>
+        </div>
+        <div class="col-12 text-center mt-3">
+            <button type="submit" class="btn btn-primary">Calculate</button>
+        </div>
     </form>
 
     {% if result %}
-    <div class="result">
-        <h2>Result:</h2>
-        <p><strong>Volume:</strong> {{ result }} m³</p>
+        {% if result.error %}
+            <div class="alert alert-danger mt-4">{{ result.error }}</div>
+        {% else %}
+            <div class="section-title">🧮 Volume</div>
+            <p><strong>Total Volume:</strong> {{ result.volume }} m³</p>
 
-        <h3>Material Estimates:</h3>
-        <ul>
-            <li><strong>Cement:</strong> {{ materials.cement }} bags</li>
-            <li><strong>Sand:</strong> {{ materials.sand }} tons</li>
-            <li><strong>Granite:</strong> {{ materials.granite }} tons</li>
-            <li><strong>Water:</strong> {{ materials.water }} liters</li>
-        </ul>
+            <div class="section-title">📦 Material Estimates</div>
+            <ul>
+                <li><strong>Cement:</strong> {{ result.materials.cement }} bags</li>
+                <li><strong>Sand:</strong> {{ result.materials.sand }} tons</li>
+                <li><strong>Granite:</strong> {{ result.materials.granite }} tons</li>
+                <li><strong>Water:</strong> {{ result.materials.water }} liters</li>
+            </ul>
 
-        <h3>Cost Estimates:</h3>
-        <ul>
-            <li><strong>Cement:</strong> ₦{{ costs.cement }}</li>
-            <li><strong>Sand:</strong> ₦{{ costs.sand }}</li>
-            <li><strong>Granite:</strong> ₦{{ costs.granite }}</li>
-            <li><strong>Water:</strong> ₦{{ costs.water }}</li>
-        </ul>
+            <div class="section-title">💵 Cost Breakdown</div>
+            <ul>
+                <li><strong>Cement:</strong> ₦{{ "{:,.0f}".format(result.costs.cement) }}</li>
+                <li><strong>Sand:</strong> ₦{{ "{:,.0f}".format(result.costs.sand) }}</li>
+                <li><strong>Granite:</strong> ₦{{ "{:,.0f}".format(result.costs.granite) }}</li>
+                <li><strong>Water:</strong> ₦{{ "{:,.0f}".format(result.costs.water) }}</li>
+            </ul>
 
-        <p class="total">Total Estimated Cost: ₦{{ total_cost }}</p>
-    </div>
+            <h5 class="mt-4">Total Estimated Cost: <strong class="text-success">₦{{ "{:,.0f}".format(result.total_cost) }}</strong></h5>
+        {% endif %}
     {% endif %}
+</div>
 </body>
 </html>
+
 
 
