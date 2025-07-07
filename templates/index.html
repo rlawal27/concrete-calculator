@@ -4,87 +4,46 @@
     <meta charset="UTF-8">
     <title>Concrete Volume Calculator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f4f4f4;
-            padding-top: 30px;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        }
-        h2 {
-            margin-bottom: 20px;
-        }
-        .logo {
-            max-width: 180px;
-            margin-bottom: 20px;
-        }
-        .result-box {
-            background-color: #e9f7ef;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
-<div class="container text-center">
-    <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Logo" class="logo">
-    <h2>Concrete Volume Calculator</h2>
+<div class="container mt-5">
+    <h2 class="text-center">Concrete Volume Calculator</h2>
 
-    <form method="POST">
+    <form method="POST" action="/">
         <div class="row mb-3">
             <div class="col">
-                <input type="number" step="any" class="form-control" name="length" id="length" placeholder="Length (m)" required>
+                <input type="number" step="any" name="length" class="form-control" placeholder="Length (m)" required value="{{ length if length else '' }}">
             </div>
             <div class="col">
-                <input type="number" step="any" class="form-control" name="width" id="width" placeholder="Width (m)" required>
+                <input type="number" step="any" name="width" class="form-control" placeholder="Width (m)" required value="{{ width if width else '' }}">
             </div>
             <div class="col">
-                <input type="number" step="any" class="form-control" name="depth" id="depth" placeholder="Depth (m)" required>
+                <input type="number" step="any" name="depth" class="form-control" placeholder="Depth (m)" required value="{{ depth if depth else '' }}">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Calculate</button>
     </form>
 
     {% if result %}
-        <form method="post" action="/download" class="mt-3">
-            <input type="hidden" name="length" id="pdfLength">
-            <input type="hidden" name="width" id="pdfWidth">
-            <input type="hidden" name="depth" id="pdfDepth">
-            <button type="submit" class="btn btn-outline-success">Download Estimate as PDF</button>
-        </form>
+    <div class="alert alert-success mt-4">
+        <h4>Concrete Volume: {{ result }} m³</h4>
+        <ul>
+            <li>Cement: {{ materials.cement }} bags (₦{{ materials.cement * prices.cement }})</li>
+            <li>Sand: {{ materials.sand }} tons (₦{{ materials.sand * prices.sand }})</li>
+            <li>Granite: {{ materials.granite }} tons (₦{{ materials.granite * prices.granite }})</li>
+            <li>Water: {{ materials.water }} litres (₦{{ materials.water * prices.water }})</li>
+        </ul>
+        <h5>Total: ₦{{ materials.total }}</h5>
+    </div>
 
-        <div class="result-box text-start">
-            <h4>Concrete Volume: {{ result }} m³</h4>
-            <p><strong>Material Estimates:</strong></p>
-            <ul>
-                <li>Cement: {{ materials.cement }} bags (₦{{ "{:,.0f}".format(materials.cement * 9500) }})</li>
-                <li>Sand: {{ materials.sand }} tons (₦{{ "{:,.0f}".format(materials.sand * 7000) }})</li>
-                <li>Granite: {{ materials.granite }} tons (₦{{ "{:,.0f}".format(materials.granite * 20000) }})</li>
-                <li>Water: {{ materials.water }} liters (₦{{ "{:,.0f}".format(materials.water * 5) }})</li>
-            </ul>
-            <h5>Total Cost: ₦{{ "{:,.0f}".format(materials.cement * 9500 + materials.sand * 7000 + materials.granite * 20000 + materials.water * 5) }}</h5>
-        </div>
+    <form method="POST" action="/download">
+        <input type="hidden" name="length" value="{{ length }}">
+        <input type="hidden" name="width" value="{{ width }}">
+        <input type="hidden" name="depth" value="{{ depth }}">
+        <button type="submit" class="btn btn-success">Download Estimate as PDF</button>
+    </form>
     {% endif %}
 </div>
-
-<!-- 🔧 JavaScript for syncing form values to the PDF form -->
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-        const pdfForm = document.querySelector('form[action="/download"]');
-        if (pdfForm) {
-            pdfForm.addEventListener('submit', () => {
-                document.getElementById('pdfLength').value = document.getElementById('length').value;
-                document.getElementById('pdfWidth').value = document.getElementById('width').value;
-                document.getElementById('pdfDepth').value = document.getElementById('depth').value;
-            });
-        }
-    });
-</script>
 </body>
 </html>
 
