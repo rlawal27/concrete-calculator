@@ -2,49 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Concrete Volume Calculator</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Concrete Calculator - Adillux</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            background-color: #0050A0;
+            padding: 20px;
+            color: white;
+        }
+
+        header img {
+            width: 120px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #0050A0;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            color: #333;
+            text-align: left;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+            background-color: #F4C542;
+            color: #000;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e0b730;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #0050A0;
+            color: white;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="text-center">Concrete Volume Calculator</h2>
 
-    <form method="POST" action="/">
-        <div class="row mb-3">
-            <div class="col">
-                <input type="number" step="any" name="length" class="form-control" placeholder="Length (m)" required value="{{ length if length else '' }}">
-            </div>
-            <div class="col">
-                <input type="number" step="any" name="width" class="form-control" placeholder="Width (m)" required value="{{ width if width else '' }}">
-            </div>
-            <div class="col">
-                <input type="number" step="any" name="depth" class="form-control" placeholder="Depth (m)" required value="{{ depth if depth else '' }}">
-            </div>
+    <header>
+        <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Adillux Logo">
+        <h1>Concrete Volume & Cost Calculator</h1>
+    </header>
+
+    <main>
+        <form method="POST">
+            <label for="length">Length (meters):</label>
+            <input type="number" step="any" name="length" required>
+
+            <label for="width">Width (meters):</label>
+            <input type="number" step="any" name="width" required>
+
+            <label for="depth">Depth (meters):</label>
+            <input type="number" step="any" name="depth" required>
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        {% if result %}
+        <div class="result">
+            <h2>Volume: {{ result }} m³</h2>
+            <h3>Material Estimates:</h3>
+            <ul>
+                {% for item in materials %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+
+            <form method="POST" action="/download">
+                <input type="hidden" name="length" value="{{ length }}">
+                <input type="hidden" name="width" value="{{ width }}">
+                <input type="hidden" name="depth" value="{{ depth }}">
+                <button type="submit">Download Estimate as PDF</button>
+            </form>
         </div>
-        <button type="submit" class="btn btn-primary">Calculate</button>
-    </form>
+        {% endif %}
+    </main>
 
-    {% if result %}
-    <div class="alert alert-success mt-4">
-        <h4>Concrete Volume: {{ result }} m³</h4>
-        <ul>
-            <li>Cement: {{ materials.cement }} bags (₦{{ materials.cement * prices.cement }})</li>
-            <li>Sand: {{ materials.sand }} tons (₦{{ materials.sand * prices.sand }})</li>
-            <li>Granite: {{ materials.granite }} tons (₦{{ materials.granite * prices.granite }})</li>
-            <li>Water: {{ materials.water }} litres (₦{{ materials.water * prices.water }})</li>
-        </ul>
-        <h5>Total: ₦{{ materials.total }}</h5>
-    </div>
+    <footer>
+        © 2025 Adillux Technologies Ltd. All rights reserved.
+    </footer>
 
-    <form method="POST" action="/download">
-        <input type="hidden" name="length" value="{{ length }}">
-        <input type="hidden" name="width" value="{{ width }}">
-        <input type="hidden" name="depth" value="{{ depth }}">
-        <button type="submit" class="btn btn-success">Download Estimate as PDF</button>
-    </form>
-    {% endif %}
-</div>
 </body>
 </html>
-
-
