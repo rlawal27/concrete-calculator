@@ -24,6 +24,12 @@
             margin: 0 auto;
         }
 
+        header h1 {
+            margin-top: 10px;
+            font-size: 24px;
+            color: white;
+        }
+
         main {
             padding: 20px;
             max-width: 600px;
@@ -32,10 +38,6 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             margin-top: 30px;
             border-radius: 8px;
-        }
-
-        h1 {
-            color: #0050A0;
         }
 
         label {
@@ -86,48 +88,48 @@
 </head>
 <body>
 
-    <header>
-        <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Adillux Logo">
-        <h1>Concrete Volume & Cost Calculator</h1>
-    </header>
+<header>
+    <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Adillux Logo">
+    <h1>Concrete Volume & Cost Calculator</h1>
+</header>
 
-    <main>
-        <form method="POST">
-            <label for="length">Length (meters):</label>
-            <input type="number" step="any" name="length" required>
+<main>
+    <form method="POST">
+        <label for="length">Length (meters):</label>
+        <input type="number" step="any" name="length" required>
 
-            <label for="width">Width (meters):</label>
-            <input type="number" step="any" name="width" required>
+        <label for="width">Width (meters):</label>
+        <input type="number" step="any" name="width" required>
 
-            <label for="depth">Depth (meters):</label>
-            <input type="number" step="any" name="depth" required>
+        <label for="depth">Depth (meters):</label>
+        <input type="number" step="any" name="depth" required>
 
-            <button type="submit">Calculate</button>
+        <button type="submit">Calculate</button>
+    </form>
+
+    {% if result %}
+    <div class="result">
+        <h2>Volume: {{ result }} m³</h2>
+        <h3>Material Estimates:</h3>
+        <ul>
+            {% for item in materials %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+
+        <form method="POST" action="/download">
+            <input type="hidden" name="length" value="{{ length }}">
+            <input type="hidden" name="width" value="{{ width }}">
+            <input type="hidden" name="depth" value="{{ depth }}">
+            <button type="submit">Download Estimate as PDF</button>
         </form>
+    </div>
+    {% endif %}
+</main>
 
-        {% if result %}
-        <div class="result">
-            <h2>Volume: {{ result }} m³</h2>
-            <h3>Material Estimates:</h3>
-            <ul>
-                {% for item in materials %}
-                    <li>{{ item }}</li>
-                {% endfor %}
-            </ul>
-
-            <form method="POST" action="/download">
-                <input type="hidden" name="length" value="{{ length }}">
-                <input type="hidden" name="width" value="{{ width }}">
-                <input type="hidden" name="depth" value="{{ depth }}">
-                <button type="submit">Download Estimate as PDF</button>
-            </form>
-        </div>
-        {% endif %}
-    </main>
-
-    <footer>
-        © 2025 Adillux Technologies Ltd. All rights reserved.
-    </footer>
+<footer>
+    © 2025 Adillux Technologies Ltd. All rights reserved.
+</footer>
 
 </body>
 </html>
