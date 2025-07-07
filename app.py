@@ -4,71 +4,95 @@ import os
 
 app = Flask(__name__)
 
-# Material prices
+# Prices
 CEMENT_BAG_PRICE = 9500
-SAND_TRIP_PRICE = 70000  # 10 tons
+SAND_TRIP_PRICE = 70000  # per 10-ton trip
 GRANITE_TON_PRICE = 20000
-WATER_10000L_PRICE = 50000
-
-# Cement usage rates (bags per m³)
-CEMENT_RATES = {
-    'slab': 7,
-    'column': 9,
-    'beam': 8,
-    'footing': 6.5
-}
+WATER_TRIP_PRICE = 50000  # per 10,000 litres
 
 @app.route('/', methods=['GET', 'POST'])
-def calculate_volume():
+def index():
     if request.method == 'POST':
-        length = float(request.form['length'])
-        width = float(request.form['width'])
-        depth = float(request.form['depth'])
-        work_type = request.form['work_type']
+        length = float(request.form.get('length') or 0)
+        width = float(request.form.get('width') or 0)
+        thickness = float(request.form.get('thickness') or 0)
 
-        volume = round(length * width * depth, 2)
-        cement_bags = round(volume * CEMENT_RATES[work_type])
-        sand_price = "{:,.0f}".format(SAND_TRIP_PRICE)
-        granite_price = "{:,.0f}".format(volume * 1.5 * GRANITE_TON_PRICE)
-        water_price = "{:,.0f}".format(WATER_10000L_PRICE)
+        volume = (length * width * thickness) / 1000000  # m³
 
-        result = {
-            'volume': volume,
-            'cement': cement_bags,
-            'sand_price': sand_price,
-            'granite_price': granite_price,
-            'water_price': water_price,
-            'work_type': work_type
+        # Material estimates
+        cement_bags = volume * 6.5
+        sand_trips = volume * 0.5
+        granite_tons = volume * 1.2
+        water_trips = volume * 0.05
+
+        # Cost estimates
+        cement_cost = cement_bags * CEMENT_BAG_PRICE
+        sand_cost = sand_trips * SAND_TRIP_PRICE
+        granite_cost = granite_tons * GRANITE_TON_PRICE
+        water_cost = water_trips * WATER_TRIP_PRICE
+        total_cost = cement_cost + sand_cost + granite_cost + water_cost
+
+        result = round(volume, 2)
+        materials = {
+            "Cement (bags)": (round(cement_bags, 1), round(cement_cost, 2)),
+            "Sand (10-ton trips)": (round(sand_trips, 2), round(sand_cost, 2)),
+            "Granite (tons)": (round(granite_tons, 2), round(granite_cost, 2)),
+            "Water (10,000L trips)": (round(water_trips, 2), round(water_cost, 2)),
+            "Total Estimate": ("", round(total_cost, 2))
         }
 
-        return render_template('index.html', result=result)
+        if request.form.get('generate_pdf') == 'yes':
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", "B", 14)
+            pdf.cell(200, 10, "Concrete Estimate", ln=True, align="C")
+            pdf.set_font("Arial", "", 12)
+            pdf.cell(200, 10, f"Volume: {result} m³", ln=True)
+            for material, (qty, cost) in materials.items():
+                if material != "Total Estimate":
+                    pdf.cell(200, 10, f"{material}: {qty} units - ₦{cost:,.2f}", ln=True)
+            pdf.cell(200, 10, f"Total Cost: ₦{materials['Total Estimate'][1]:,.2f}", ln=True)
+            filename = "concrete_estimate.pdf"
+            pdf.output(filename)
+            return send_file(filename, as_attachment=True)
 
-    return render_template('index.html')
+        return render_template("index.html", result=result, materials=materials)
 
-@app.route('/download', methods=['POST'])
-def download_pdf():
-    work_type = request.form['work_type']
-    volume = request.form['volume']
-    cement = request.form['cement']
-    sand_price = request.form['sand_price']
-    granite_price = request.form['granite_price']
-    water_price = request.form['water_price']
+    return render_template("index.html")
 
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt="Concrete Estimate Summary", ln=True, align='C')
-    pdf.ln(10)
-    pdf.cell(200, 10, txt=f"Civil Work Type: {work_type.title()}", ln=True)
-    pdf.cell(200, 10, txt=f"Volume: {volume} m³", ln=True)
-    pdf.cell(200, 10, txt=f"Cement Bags: {cement} bags", ln=True)
-    pdf.cell(200, 10, txt=f"Sand Cost: ₦{sand_price}", ln=True)
-    pdf.cell(200, 10, txt=f"Granite Cost: ₦{granite_price}", ln=True)
-    pdf.cell(200, 10, txt=f"Water Cost: ₦{water_price}", ln=True)
+@app.route('/civil-quotation', methods=['GET', 'POST'])
+def civil_quotation():
+    if request.method == 'POST':
+        excavation = float(request.form.get('excavation') or 0)
+        blockwork = float(request.form.get('blockwork') or 0)
+        plastering = float(request.form.get('plastering') or 0)
+        concrete = float(request.form.get('concrete') or 0)
+        formwork = float(request.form.get('formwork') or 0)
+        labour = float(request.form.get('labour') or 0)
 
-    filepath = "estimate.pdf"
-    pdf.output(filepath)
-    return send_file(filepath, as_attachment=True)
+        rates = {
+            'Excavation': 3000,
+            'Blockwork': 2500,
+            'Plastering': 1800,
+            'Concrete': 40000,
+            'Formwork': 1500,
+            'Labour': 1
+        }
+
+        result = [
+            {'name': 'Excavation', 'qty': excavation, 'rate': rates['Excavation'], 'total': excavation * rates['Excavation']},
+            {'name': 'Blockwork', 'qty': blockwork, 'rate': rates['Blockwork'], 'total': blockwork * rates['Blockwork']},
+            {'name': 'Plastering', 'qty': plastering, 'rate': rates['Plastering'], 'total': plastering * rates['Plastering']},
+            {'name': 'Concrete', 'qty': concrete, 'rate': rates['Concrete'], 'total': concrete * rates['Concrete']},
+            {'name': 'Formwork', 'qty': formwork, 'rate': rates['Formwork'], 'total': formwork * rates['Formwork']},
+            {'name': 'Labour', 'qty': labour, 'rate': 1, 'total': labour},
+        ]
+
+        total = sum(item['total'] for item in result)
+
+        return render_template('civil_works.html', result=result, total=round(total, 2))
+
+    return render_template('civil_works.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
