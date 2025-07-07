@@ -13,6 +13,75 @@
             background-color: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .logo {
+            max-width: 180px;
+            margin-bottom: 20px;
+        }
+        .result-box {
+            background-color: #e9f7ef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container text-center">
+    <img src="{{ url_for('static', filename='adillux-logo.png') }}" alt="Logo" class="logo">
+
+    <h2>Concrete Volume Calculator</h2>
+
+    <form method="POST">
+        <div class="row mb-3">
+            <div class="col">
+                <input type="number" step="any" class="form-control" name="length" id="length" placeholder="Length (m)" required>
+            </div>
+            <div class="col">
+                <input type="number" step="any" class="form-control" name="width" id="width" placeholder="Width (m)" required>
+            </div>
+            <div class="col">
+                <input type="number" step="any" class="form-control" name="depth" id="depth" placeholder="Depth (m)" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Calculate</button>
+    </form>
+
+    <form method="post" action="/download">
+        <input type="hidden" name="length" id="pdfLength">
+        <input type="hidden" name="width" id="pdfWidth">
+        <input type="hidden" name="depth" id="pdfDepth">
+        <button type="submit" class="btn btn-outline-success mt-3">Download Estimate as PDF</button>
+    </form>
+
+    {% if result %}
+        <div class="result-box text-start">
+            <h4>Concrete Volume: {{ result }} m³</h4>
+            <p><strong>Material Estimates:</strong></p>
+            <ul>
+                <li>Cement: {{ materials.cement }} bags (₦{{ "{:,.0f}".format(materials.cement * 9500) }})</li>
+                <li>Sand: {{ materials.sand }} tons (₦{{ "{:,.0f}".format(materials.sand * 7000) }})</li>
+                <li>Granite: {{ materials.granite }} tons (₦{{ "{:,.0f}".format(materials.granite * 20000) }})</li>
+                <li>Water: {{ materials.water }} liters (₦{{ "{:,.0f}".format(materials.water * 5) }})</li>
+            </ul>
+            <h5>Total Cost: ₦{{ "{:,.0f}".format(materials.cement * 9500 + materials.sand * 7000 + materials.granite * 20000 + materials.water * 5) }}</h5>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    const syncInputs = () => {
+        document.getElementById('pdfLength').value = document.getElementById('length').value;
+        document.getElementById('pdfWidth').value = document.getElementById('width').value;
+        document.getElementById('pdfDepth').value = document.getElementById('depth').value;
+    };
+    document.querySelector('form[action="/download"]').addEventListener('submit', syncInputs);
+</script>
+</body>
+</html>
 
 
