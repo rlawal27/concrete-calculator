@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Estimate</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 14px; }
+        h2 { color: #222; }
+        ul { padding-left: 0; list-style-type: none; }
+        li { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Concrete Estimate</h2>
+    <p><strong>Volume:</strong> {{ volume }} m³</p>
+    <h4>Materials:</h4>
+    <ul>
+        <li>Cement: {{ materials.cement }} bags</li>
+        <li>Sand: {{ materials.sand }} tons</li>
+        <li>Granite: {{ materials.granite }} tons</li>
+        <li>Water: {{ materials.water }} liters</li>
+    </ul>
+    <h4>Costs:</h4>
+    <ul>
+        <li>Cement: ₦{{ "{:,.0f}".format(costs.cement) }}</li>
+        <li>Sand: ₦{{ "{:,.0f}".format(costs.sand) }}</li>
+        <li>Granite: ₦{{ "{:,.0f}".format(costs.granite) }}</li>
+        <li>Water: ₦{{ "{:,.0f}".format(costs.water) }}</li>
+    </ul>
+    <h3>Total Cost: ₦{{ "{:,.0f}".format(total_cost) }}</h3>
+</body>
+</html>

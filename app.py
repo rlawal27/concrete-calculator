@@ -49,5 +49,41 @@ def calculate_volume():
 
 if __name__ == '__main__':
     app.run(debug=True)
+from flask import make_response, render_template_string
+from xhtml2pdf import pisa
+import io
+
+@app.route('/download', methods=['POST'])
+def download_pdf():
+    try:
+        length = float(request.form['length'])
+        width = float(request.form['width'])
+        depth = float(request.form['depth'])
+
+        volume = round(length * width * depth, 2)
+        materials = {
+            'cement': round(volume * 7, 1),
+            'sand': round(volume * 0.5, 1),
+            'granite': round(volume * 0.6, 1),
+            'water': round(volume * 150, 1)
+        }
+        costs = {
+            'cement': materials['cement'] * 9500,
+            'sand': materials['sand'] * 7000,
+            'granite': materials['granite'] * 20000,
+            'water': materials['water'] * 5
+        }
+        total_cost = sum(costs.values())
+
+        pdf_template = render_template('pdf_template.html', volume=volume, materials=materials, costs=costs, total_cost=total_cost)
+        pdf_buffer = io.BytesIO()
+        pisa.CreatePDF(io.StringIO(pdf_template), dest=pdf_buffer)
+        response = make_response(pdf_buffer.getvalue())
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'attachment; filename=estimate.pdf'
+        return response
+
+    except Exception as e:
+        return str(e)
 
 
