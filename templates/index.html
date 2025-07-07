@@ -1,38 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Concrete Volume Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 40px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: #0066cc;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background-color: #0066cc;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0055aa;
+        }
+
+        .result-box {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Concrete Volume Calculator</h1>
+    <div class="container">
+        <h1>Concrete Volume Calculator</h1>
 
-    <form method="POST">
-        <label>Length (m):</label><br>
-        <input type="number" step="0.01" name="length" required><br><br>
+        <form method="POST">
+            <label for="length">Length (m):</label>
+            <input type="number" step="0.01" name="length" required>
 
-        <label>Width (m):</label><br>
-        <input type="number" step="0.01" name="width" required><br><br>
+            <label for="width">Width (m):</label>
+            <input type="number" step="0.01" name="width" required>
 
-        <label>Height (m):</label><br>
-        <input type="number" step="0.01" name="height" required><br><br>
+            <label for="height">Height (m):</label>
+            <input type="number" step="0.01" name="height" required>
 
-        <button type="submit">Calculate Volume</button>
-    </form>
+            <button type="submit">Calculate Volume</button>
+        </form>
 
-    {% if result %}
-        <h2>Volume: {{ result }} m³</h2>
+        {% if result %}
+            <div class="result-box">
+                <h2>Volume: {{ result }} m³</h2>
 
-        {% if materials %}
-            <h3>Estimated Materials:</h3>
-            <ul>
-                <li>Cement: {{ materials.cement }} bags</li>
-                <li>Sand: {{ materials.sand }} m³</li>
-                <li>Granite: {{ materials.granite }} m³</li>
-                <li>Water: {{ materials.water }} liters</li>
-            </ul>
+                {% if materials %}
+                    <h3>Estimated Materials:</h3>
+                    <ul>
+                        <li><strong>Cement:</strong> {{ materials.cement }} bags</li>
+                        <li><strong>Sand:</strong> {{ materials.sand }} m³</li>
+                        <li><strong>Granite:</strong> {{ materials.granite }} m³</li>
+                        <li><strong>Water:</strong> {{ materials.water }} liters</li>
+                    </ul>
+                {% endif %}
+            </div>
         {% endif %}
-    {% endif %}
+    </div>
 </body>
 </html>
+
 
