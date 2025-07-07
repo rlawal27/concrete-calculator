@@ -6,37 +6,57 @@ app = Flask(__name__)
 def calculate_volume():
     result = None
     materials = {}
-    
+    costs = {}
+    total_cost = 0
+
     if request.method == 'POST':
         try:
             length = float(request.form['length'])
             width = float(request.form['width'])
             height = float(request.form['height'])
-            volume = length * width * height
-            result = f"{volume:.2f} cubic meters (m³)"
 
-            # Material estimate calculations (for 1:2:4 mix)
-            dry_volume = volume * 1.54
-            cement_bags = round(dry_volume * 7)
-            sand_m3 = round(dry_volume * 0.44, 2)
-            granite_m3 = round(dry_volume * 0.88, 2)
-            water_litres = round(volume * 180)
+            # Calculate concrete volume
+            volume = round(length * width * height, 2)
+            result = volume
 
+            # Estimate material quantities
             materials = {
-                "Cement (bags)": cement_bags,
-                "Sand (m³)": sand_m3,
-                "Granite (m³)": granite_m3,
-                "Water (litres)": water_litres
+                'cement': round(volume * 7, 2),     # bags
+                'sand': round(volume * 0.5, 2),     # tons
+                'granite': round(volume * 0.9, 2),  # tons
+                'water': round(volume * 180, 2)     # liters
             }
 
-        except:
+            # Prices based on your inputs
+            unit_prices = {
+                'cement': 9500,     # per bag
+                'sand': 700,        # per ton
+                'granite': 20000,   # per ton
+                'water': 5          # per liter
+            }
+
+            # Calculate individual and total cost
+            costs = {
+                'cement': round(materials['cement'] * unit_prices['cement'], 2),
+                'sand': round(materials['sand'] * unit_prices['sand'], 2),
+                'granite': round(materials['granite'] * unit_prices['granite'], 2),
+                'water': round(materials['water'] * unit_prices['water'], 2)
+            }
+
+            total_cost = sum(costs.values())
+
+        except ValueError:
             result = "Invalid input. Please enter numbers only."
 
-    return render_template('index.html', result=result, materials=materials)
-
-import os
+    return render_template(
+        'index.html',
+        result=result,
+        materials=materials,
+        costs=costs,
+        total_cost=total_cost
+    )
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True)
+
 
