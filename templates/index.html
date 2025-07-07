@@ -51,14 +51,14 @@
         <button type="submit" class="btn btn-primary">Calculate</button>
     </form>
 
-    <form method="post" action="/download">
-        <input type="hidden" name="length" id="pdfLength">
-        <input type="hidden" name="width" id="pdfWidth">
-        <input type="hidden" name="depth" id="pdfDepth">
-        <button type="submit" class="btn btn-outline-success mt-3">Download Estimate as PDF</button>
-    </form>
-
     {% if result %}
+        <form method="post" action="/download">
+            <input type="hidden" name="length" id="pdfLength">
+            <input type="hidden" name="width" id="pdfWidth">
+            <input type="hidden" name="depth" id="pdfDepth">
+            <button type="submit" class="btn btn-outline-success mt-3">Download Estimate as PDF</button>
+        </form>
+
         <div class="result-box text-start">
             <h4>Concrete Volume: {{ result }} m³</h4>
             <p><strong>Material Estimates:</strong></p>
